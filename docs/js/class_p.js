@@ -744,7 +744,7 @@ class Puzzle {
             } else {
                 if (this.space[spaceSide] > 0) {
                     this.space[spaceSide] = this.space[spaceSide] - 1;
-                } else if (pu.mode.qa === 'pu_a') {
+                } else {
                     return; // Protect board content
                 }
             }
@@ -834,7 +834,7 @@ class Puzzle {
                 this.centerlist.splice(index, 1);
             }
         }
-        
+
         // Add Box elements
         for (let n = 0; n < boxadd.length; n++) {
             let num = boxadd[n];
