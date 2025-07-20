@@ -939,7 +939,7 @@ onload = function() {
         if (fittype === 'flex') {
             if ((edit_mode === "combi" && improve_modes.includes(pu.mode[pu.mode.qa][edit_mode][0])) ||
                 edit_mode === "sudoku" || edit_mode === "number")
-                pu.type = [0];
+                type = [0];
         }
 
         for (var i = 0; i < pu.point.length; i++) {
@@ -950,13 +950,6 @@ onload = function() {
                     num = i;
                 }
             }
-        }
-
-        // resetting the type for starbattle composite mode
-        if (fittype === 'flex') {
-            if ((edit_mode === "combi" && improve_modes.includes(pu.mode[pu.mode.qa][edit_mode][0])) ||
-                edit_mode === "sudoku" || edit_mode === "number")
-                pu.type = type;
         }
 
         //const endTime = performance.now();
