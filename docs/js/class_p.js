@@ -181,6 +181,8 @@ class Puzzle {
         this.reflect = [1, 1];
         this.centerlist = [];
         this.solution = "";
+        this.solution_area = [];
+        this.inclusive_solution_area = true; // Include boundary of solution area?
         this.sol_flag = 0;
         this.undoredo_counter = 0;
         this.loop_counter = false;
