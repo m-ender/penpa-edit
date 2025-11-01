@@ -2008,6 +2008,19 @@ function load(urlParam, type = 'url', origurl = null) {
     for (var i = 1; i < rtext[5].length; i++) {
         rtext[5][i] = (rtext[5][i - 1] + rtext[5][i]);
     }
+    
+    if (rtext[19] !== undefined && rtext[20] !== undefined) {
+        rtext[19] = JSON.parse(rtext[19]);
+
+        for (var i = 1; i < rtext[19].length; i++) {
+            rtext[19][i] = (rtext[19][i - 1] + rtext[19][i]);
+        }
+
+        pu.solution_area = rtext[19];
+
+        let parsedValue = JSON.parse(rtext[20]);
+        pu.inclusive_solution_area = parsedValue === 1;
+    }
 
     // Tab settings
     if (rtext[6]) {

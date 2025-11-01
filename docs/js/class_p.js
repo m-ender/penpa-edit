@@ -1741,6 +1741,21 @@ class Puzzle {
         return text;
     }
 
+    __export_solution_area_shared() {
+        let list = [];
+        if (this.solution_area.length > 0) {
+            list.push(this.solution_area[0]);
+            for (let i = 1; i < this.solution_area.length; i++) {
+                list.push(this.solution_area[i] - this.solution_area[i - 1]);
+            }
+        }
+        let text = JSON.stringify(list) + "\n";
+
+        text += this.inclusive_solution_area ? "1\n" : "0\n";
+
+        return text;
+    }
+
     __export_finalize_shared(text) {
         var puzzle_data = encrypt_data(text);
         return puzzle_data;
@@ -1819,11 +1834,13 @@ class Puzzle {
 
         // Custom Answer Message
         if (this.mmode === "solve") {
-            text += false;
+            text += false + "\n";
         } else {
             let custom_message = document.getElementById("custom_message").value;
-            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F') + "\n";
         }
+
+        text += this.__export_solution_area_shared();
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
@@ -1911,7 +1928,9 @@ class Puzzle {
 
         // Custom Answer Message
         let custom_message = document.getElementById("custom_message").value;
-        text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+        text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F') + "\n";
+
+        text += this.__export_solution_area_shared();
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
@@ -1973,10 +1992,12 @@ class Puzzle {
         // Custom Answer Message
         if (type === "answercheck") {
             let custom_message = document.getElementById("custom_message").value;
-            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F') + "\n";
         } else {
-            text += false;
+            text += false + "\n";
         }
+
+        text += this.__export_solution_area_shared();
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
@@ -2019,7 +2040,9 @@ class Puzzle {
         text += this.__export_checker_shared();
 
         // Custom Answer Message
-        text += false;
+        text += false + "\n";
+
+        text += this.__export_solution_area_shared();
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
