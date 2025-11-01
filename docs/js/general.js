@@ -83,6 +83,7 @@ function create() {
 
     pu = make_class(gridtype);
     pu.reset_frame();
+    pu.reset_solution_area_to_centerlist();
 
     // Drawing Panel
     panel_pu = new Panel();
@@ -223,6 +224,7 @@ function create_newboard() {
         }
 
         pu.reset_frame(); // Draw the board
+        pu.reset_solution_area_to_centerlist();
         panel_pu.draw_panel();
         document.getElementById('modal').style.display = 'none';
         pu.mode_set(pu.mode[pu.mode.qa].edit_mode); //include redraw
@@ -3137,6 +3139,7 @@ function decode_puzzlink(url) {
 
     function setupProblem(puzzle, mode) {
         puzzle.reset_frame(); // Draw the board
+        puzzle.reset_solution_area_to_centerlist();
         panel_pu.draw_panel();
         document.getElementById('modal').style.display = 'none';
         puzzle.mode_set(mode); //include redraw
