@@ -1736,7 +1736,7 @@ class Puzzle {
         var text = JSON.stringify(this.__get_answer_settings("_or")) + "\n";
 
         // Save genre tags
-        text += JSON.stringify($('#genre_tags_opt').select2("val"));
+        text += JSON.stringify($('#genre_tags_opt').select2("val")) + "\n";
 
         return text;
     }
@@ -1819,10 +1819,10 @@ class Puzzle {
 
         // Custom Answer Message
         if (this.mmode === "solve") {
-            text += "\n" + false;
+            text += false;
         } else {
             let custom_message = document.getElementById("custom_message").value;
-            text += "\n" + custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
         }
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
@@ -1911,7 +1911,7 @@ class Puzzle {
 
         // Custom Answer Message
         let custom_message = document.getElementById("custom_message").value;
-        text += "\n" + custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+        text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
@@ -1973,9 +1973,9 @@ class Puzzle {
         // Custom Answer Message
         if (type === "answercheck") {
             let custom_message = document.getElementById("custom_message").value;
-            text += "\n" + custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
+            text += custom_message.replace(/\n/g, '%2D').replace(/,/g, '%2C').replace(/&/g, '%2E').replace(/=/g, '%2F');
         } else {
-            text += "\n" + false;
+            text += false;
         }
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
@@ -2019,7 +2019,7 @@ class Puzzle {
         text += this.__export_checker_shared();
 
         // Custom Answer Message
-        text += "\n" + false;
+        text += false;
 
         for (var i = 0; i < COMPRESS_SUB.length; i++) {
             text = text.split(COMPRESS_SUB[i][0]).join(COMPRESS_SUB[i][1]);
