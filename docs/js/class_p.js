@@ -362,6 +362,10 @@ class Puzzle {
         this.make_frameline();
     }
 
+    reset_solution_area_to_centerlist() {
+        this.solution_area = this.centerlist.slice()
+    }
+
     // Make various backwards compatibility patches to puzzle data after loading a puzzle in case
     // it uses outdated formats etc.
     load_compat_fixes() {
