@@ -84,6 +84,9 @@ function set_surface_style(ctx, type) {
         case 13:
             ctx.fillStyle = Color.ORANGE_TRANSPARENT;
             break;
+        case 14: // solution area fallback
+            ctx.fillStyle = Color.BLUE_TRANSPARENT;
+            break;
         case 99:
             ctx.fillStyle = Color.GREY_LIGHT_VERY;
             break;
@@ -256,7 +259,7 @@ function set_line_style(ctx, type, ccolor = "none") {
             var w = pu.size * 0.16;
             ctx.setLineDash([b, w]);
             ctx.lineDashOffset = b * 0.5;
-            ctx.strokeStyle = Color.BLUE_LIGHT;
+            ctx.strokeStyle = Color.BLUE_TRANSPARENT;
             ctx.lineWidth = (pu.size * 0.1) | 0;
             break;
         case 118: //solution area
@@ -267,7 +270,7 @@ function set_line_style(ctx, type, ccolor = "none") {
             if (ccolor !== "none") {
                 ctx.strokeStyle = ccolor;
             } else {
-                ctx.strokeStyle = Color.BLUE_LIGHT;
+                ctx.strokeStyle = Color.BLUE_TRANSPARENT;
             }
             ctx.lineWidth = (pu.size * 0.1) | 0;
             break;

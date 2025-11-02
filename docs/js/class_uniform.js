@@ -726,6 +726,9 @@ class Puzzle_truncated_square extends Puzzle {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     draw_lattice() {
@@ -3064,6 +3067,9 @@ class Puzzle_tetrakis_square extends Puzzle_truncated_square {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     rotate_theta(th) {
@@ -3725,6 +3731,9 @@ class Puzzle_snub_square extends Puzzle_truncated_square {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     rotate_theta(th) {
@@ -4367,6 +4376,9 @@ class Puzzle_cairo_pentagonal extends Puzzle_truncated_square {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     rotate_theta(th) {
@@ -4966,6 +4978,9 @@ class Puzzle_iso extends Puzzle_truncated_square {
             this.draw_number("pu_q");
             this.draw_cursol();
             this.draw_freecircle();
+        }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
         }
     }
 
@@ -6124,6 +6139,9 @@ class Puzzle_rhombitrihexagonal extends Puzzle_truncated_square {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     rotate_theta(th) {
@@ -6777,6 +6795,9 @@ class Puzzle_deltoidal_trihexagonal extends Puzzle_truncated_square {
             this.draw_number("pu_q");
             this.draw_cursol();
             this.draw_freecircle();
+        }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
         }
     }
 
@@ -7598,6 +7619,9 @@ class Puzzle_penrose_P3 extends Puzzle {
             this.draw_number("pu_q");
             this.draw_cursol();
             this.draw_freecircle();
+        }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
         }
     }
 
