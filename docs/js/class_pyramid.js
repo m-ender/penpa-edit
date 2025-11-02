@@ -180,6 +180,7 @@ class Puzzle_pyramid extends Puzzle {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":

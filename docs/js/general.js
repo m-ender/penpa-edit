@@ -3045,6 +3045,7 @@ function set_solvemode(type = "url") {
     document.getElementById("newboard").style.display = "none";
     document.getElementById("rotation").style.display = "none";
     document.getElementById("mo_board_lb").classList.add('is_hidden');
+    document.getElementById("mo_solution_area_lb").classList.add('is_hidden');
     document.getElementById("sub_number2_lb").style.display = "none";
     document.getElementById("sub_number4_lb").style.display = "none";
     document.getElementById("sub_number11_lb").style.display = "none";

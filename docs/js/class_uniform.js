@@ -234,6 +234,7 @@ class Puzzle_truncated_square extends Puzzle {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -2879,6 +2880,7 @@ class Puzzle_tetrakis_square extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -3543,6 +3545,7 @@ class Puzzle_snub_square extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -4188,6 +4191,7 @@ class Puzzle_cairo_pentagonal extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -4768,6 +4772,7 @@ class Puzzle_iso extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -5951,6 +5956,7 @@ class Puzzle_rhombitrihexagonal extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -6608,6 +6614,7 @@ class Puzzle_deltoidal_trihexagonal extends Puzzle_truncated_square {
             case "surface":
             case "multicolor":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":
@@ -7294,6 +7301,7 @@ class Puzzle_penrose_P3 extends Puzzle {
         switch (this.mode[this.mode.qa].edit_mode) {
             case "surface":
             case "board":
+            case "solution_area":
                 type = [0];
                 break;
             case "symbol":

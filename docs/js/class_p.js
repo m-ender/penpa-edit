@@ -155,6 +155,7 @@ class Puzzle {
                 "symbol": ["circle_L", 1],
                 "special": ["thermo", ""],
                 "board": ["", ""],
+                "solution_area": ["", ""],
                 "move": ["1", ""],
                 "combi": ["battleship", 3],
                 "sudoku": ["1", 1]
@@ -171,6 +172,7 @@ class Puzzle {
                 "symbol": ["circle_L", 1],
                 "special": ["thermo", ""],
                 "board": ["", ""],
+                "solution_area": ["", ""],
                 "move": ["1", ""],
                 "combi": ["battleship", 3],
                 "sudoku": ["1", 9]
@@ -8467,6 +8469,9 @@ class Puzzle {
                 case "board":
                     this.mouse_board(x, y, num);
                     break;
+                case "solution_area":
+                    this.mouse_solution_area(x, y, num);
+                    break;
                 case "move":
                     this.mouse_move(x, y, num);
                     break;
@@ -9988,6 +9993,52 @@ class Puzzle {
                 }
             }
             this.make_frameline();
+            this.redraw();
+        }
+    }
+    
+    //////////////////////////
+    // solution area
+    //////////////////////////
+
+    mouse_solution_area(x, y, num) {
+        if (this.mouse_mode === "down_left") {
+            this.drawing = true;
+            this.re_solution_area(num);
+        } else if (this.mouse_mode === "move") {
+            this.re_solution_area_move(num);
+            this.last = num;
+        } else if (this.mouse_mode === "up") {
+            this.drawing = false;
+            this.last = -1;
+        } else if (this.mouse_mode === "out") {
+            this.drawing = false;
+            this.last = -1;
+        }
+    }
+
+    re_solution_area(num) {
+        var index = this.solution_area.indexOf(num);
+        if (index === -1) {
+            this.solution_area.push(num);
+            this.drawing_mode = 1;
+        } else {
+            this.solution_area.splice(index, 1);
+            this.drawing_mode = 0;
+        }
+        this.recompute_solution_area_cage();
+        this.redraw();
+    }
+
+    re_solution_area_move(num) {
+        if (this.drawing && this.last != num) {
+            var index = this.solution_area.indexOf(num);
+            if (this.drawing_mode === 1 && index === -1) {
+                this.solution_area.push(num);
+            } else if (this.drawing_mode === 0 && index != -1) {
+                this.solution_area.splice(index, 1);
+            }
+            this.recompute_solution_area_cage();
             this.redraw();
         }
     }
