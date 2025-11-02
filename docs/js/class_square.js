@@ -179,6 +179,99 @@ class Puzzle_square extends Puzzle {
         this.cursolS = 4 * (this.nx0) * (this.ny0) + 4 + 4 * (this.nx0);
     }
 
+    recompute_solution_area_cage() {
+        this.solution_area_cage = [];
+
+        if (this.solution_area.length === 0) {
+            return;
+        }
+        
+        // This algorithm is essentially the same as the one used in Puzzle.mouse_cage(),
+        // with a few modifications.
+        // We invert the grid matrix for exclusive solution areas, essentially rendering
+        // a cage around everything except the area. However, this would result in a
+        // cage drawn all the way around the boundary of the grid, which we fix by adding
+        // an extra layer of cells around everything (which won't be rendered).
+        let grid_matrix = [];
+
+        // Grid Size
+        let row_size = parseInt(this.ny0 + 2);
+        let col_size = parseInt(this.nx0 + 2);
+
+        // Grid matrix is 0 outside the cage and 1 inside
+        for (let i = 0; i < row_size; i++) {
+            grid_matrix[i] = new Array(parseInt(col_size)).fill(this.inclusive_solution_area ? 1 : 0);
+        }
+        for (let i = 0; i < this.solution_area.length; i++) {
+            let col_num = (this.solution_area[i] % (this.nx0)) + 1;
+            let row_num = parseInt(this.solution_area[i] / this.nx0) + 1;
+            grid_matrix[row_num][col_num] = this.inclusive_solution_area ? 0 : 1;
+        }
+        
+        for (let y = 0; y < this.ny0; ++y) {
+            for (let x = 0; x < this.nx0; ++x) {
+                if (!grid_matrix[y+1][x+1]) {
+                    continue;
+                }
+                // Corner nodes of current cell
+                let top_left = 4 * this.nx0 * this.ny0 + 4 * (y * this.nx0 + x);
+                let top_right = top_left + 1;
+                let bottom_left = top_left + 2;
+                let bottom_right = top_left + 3;
+
+                // Check borders to the left
+                if (!grid_matrix[y+1][x]) {
+                    this.solution_area_cage.push([top_left, bottom_left]);
+                } else {
+                    // Corner nodes of left neighbour
+                    let top_left_left = top_left - 4;
+                    let top_right_left = top_left_left + 1;
+                    let bottom_left_left = top_left_left + 2;
+                    let bottom_right_left = top_left_left + 3;
+
+                    // Up and left
+                    if (!grid_matrix[y][x] || !grid_matrix[y][x+1]) {
+                        this.solution_area_cage.push([top_right_left, top_left]);
+                    }
+                    // Down and left
+                    if (!grid_matrix[y+2][x] || !grid_matrix[y+2][x+1]) {
+                        this.solution_area_cage.push([bottom_right_left, bottom_left]);
+                    }
+                }
+
+                // Check borders above
+                if (!grid_matrix[y][x+1]) {
+                    this.solution_area_cage.push([top_left, top_right]);
+                } else {
+                    // Corner nodes of top neighbour
+                    let top_left_top = top_left - 4 * this.nx0;
+                    let top_right_top = top_left_top + 1;
+                    let bottom_left_top = top_left_top + 2;
+                    let bottom_right_top = top_left_top + 3;
+
+                    // Up and left
+                    if (!grid_matrix[y][x] || !grid_matrix[y+1][x]) {
+                        this.solution_area_cage.push([bottom_left_top, top_left]);
+                    }
+                    // Up and right
+                    if (!grid_matrix[y][x+2] || !grid_matrix[y+1][x+2]) {
+                        this.solution_area_cage.push([bottom_right_top, top_right]);
+                    }
+                }
+
+                // Check border to the right
+                if (!grid_matrix[y+1][x+2]) {
+                    this.solution_area_cage.push([top_right, bottom_right]);
+                } // no need to check short borders, because they've been checked from the other side
+
+                // Check border below
+                if (!grid_matrix[y+2][x+1]) {
+                    this.solution_area_cage.push([bottom_left, bottom_right]);
+                } // no need to check short borders, because they've been checked from the other side
+            }
+        }
+    }
+
     type_set() {
         var type
         let edit_mode = this.mode[this.mode.qa].edit_mode;
@@ -736,6 +829,9 @@ class Puzzle_square extends Puzzle {
             this.draw_number("pu_q");
             this.draw_cursol();
             this.draw_freecircle();
+        }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
         }
     }
 
@@ -4077,6 +4173,70 @@ class Puzzle_square extends Puzzle {
                     this.draw_polygon(ctx, x + pu.size * r2 * Math.cos(degrees[i] * Math.PI / 180), y + pu.size * r2 * Math.sin(degrees[i] * Math.PI / 180), r * 0.5 * Math.sqrt(2), 6, 30);
                 }
             }
+        }
+    }
+    
+    draw_solution_area() {
+        var r = 0.16; //space between grid
+        var a = [0, 1, 2, 3],
+            c;
+        if (this.theta === 90) { a = [2, 0, 3, 1]; } else if (this.theta === 180) { a = [3, 2, 1, 0]; } else if (this.theta === 270) { a = [1, 3, 0, 2]; }
+        if (this.reflect[0] === -1) {
+            c = a[0];
+            a[0] = a[1];
+            a[1] = c;
+            c = a[2];
+            a[2] = a[3];
+            a[3] = c;
+        }
+        if (this.reflect[1] === -1) {
+            c = a[0];
+            a[0] = a[2];
+            a[2] = c;
+            c = a[1];
+            a[1] = a[3];
+            a[3] = c;
+        }
+        for (var segment of this.solution_area_cage) {
+            var i1 = segment[0];
+            var i2 = segment[1];
+            var x1, y1, x2, y2;
+
+            if (i1 % 4 === a[0]) {
+                x1 = this.point[i1].x - r * this.size;
+                y1 = this.point[i1].y - r * this.size;
+            } else if (i1 % 4 === a[1]) {
+                x1 = this.point[i1].x + r * this.size;
+                y1 = this.point[i1].y - r * this.size;
+            } else if (i1 % 4 === a[2]) {
+                x1 = this.point[i1].x - r * this.size;
+                y1 = this.point[i1].y + r * this.size;
+            } else if (i1 % 4 === a[3]) {
+                x1 = this.point[i1].x + r * this.size;
+                y1 = this.point[i1].y + r * this.size;
+            }
+            if (i2 % 4 === a[0]) {
+                x2 = this.point[i2].x - r * this.size;
+                y2 = this.point[i2].y - r * this.size;
+            } else if (i2 % 4 === a[1]) {
+                x2 = this.point[i2].x + r * this.size;
+                y2 = this.point[i2].y - r * this.size;
+            } else if (i2 % 4 === a[2]) {
+                x2 = this.point[i2].x - r * this.size;
+                y2 = this.point[i2].y + r * this.size;
+            } else if (i2 % 4 === a[3]) {
+                x2 = this.point[i2].x + r * this.size;
+                y2 = this.point[i2].y + r * this.size;
+            }
+            if (i1 % 4 === 3 || i2 % 4 === 0) {
+                set_line_style(this.ctx, 118);
+            } else {
+                set_line_style(this.ctx, 18);
+            }
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.stroke();
         }
     }
 

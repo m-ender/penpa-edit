@@ -2378,6 +2378,7 @@ function load(urlParam, type = 'url', origurl = null) {
         }
 
         // Fall back to default answer area covering entire grid
+        // TODO: replace this with simply loading all of pu.point into the list of nodes to check when expanding the solution_area
         if (!pu.solution_area || pu.solution_area.length === 0) {
             pu.solution_area = [];
             for (let i = 0; i < pu.point.length; ++i) {
@@ -2389,6 +2390,7 @@ function load(urlParam, type = 'url', origurl = null) {
             pu.inclusive_solution_area = true;
         }
     }
+    pu.recompute_solution_area_cage();
 
     pu.mode_set(pu.mode[pu.mode.qa].edit_mode, 'url'); //includes redraw
 
@@ -2680,6 +2682,7 @@ function loadver1(paramArray, rtext) {
         }
         pu.inclusive_solution_area = true;
     }
+    pu.recompute_solution_area_cage();
 
     pu.centerlist = pre_centerlist;
     pu.make_frameline(); // Board drawing

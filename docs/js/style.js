@@ -251,6 +251,26 @@ function set_line_style(ctx, type, ccolor = "none") {
             ctx.strokeStyle = Color.BLACK;
             ctx.lineWidth = (pu.size * 0.1) | 0;
             break;
+        case 18: //solution area
+            var b = pu.size * 0.04;
+            var w = pu.size * 0.16;
+            ctx.setLineDash([b, w]);
+            ctx.lineDashOffset = b * 0.5;
+            ctx.strokeStyle = Color.BLUE_LIGHT;
+            ctx.lineWidth = (pu.size * 0.1) | 0;
+            break;
+        case 118: //solution area
+            var b = pu.size * 0.02;
+            var w = pu.size * 0.16;
+            ctx.setLineDash([b, w]);
+            ctx.lineDashOffset = b * 0.5;
+            if (ccolor !== "none") {
+                ctx.strokeStyle = ccolor;
+            } else {
+                ctx.strokeStyle = Color.BLUE_LIGHT;
+            }
+            ctx.lineWidth = (pu.size * 0.1) | 0;
+            break;
         case 20:
             ctx.strokeStyle = Color.WHITE;
             ctx.lineWidth = 1;
