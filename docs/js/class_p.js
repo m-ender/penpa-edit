@@ -183,6 +183,7 @@ class Puzzle {
         this.solution = "";
         this.solution_area = [];
         this.inclusive_solution_area = true; // Include boundary of solution area?
+        this.solution_area_cage = []; // list of pairs of coordinates to render a cage representing the solution area. not used for all grid types.
         this.sol_flag = 0;
         this.undoredo_counter = 0;
         this.loop_counter = false;
@@ -364,7 +365,13 @@ class Puzzle {
     }
 
     reset_solution_area_to_centerlist() {
-        this.solution_area = this.centerlist.slice()
+        this.solution_area = this.centerlist.slice();
+        this.recompute_solution_area_cage();
+    }
+
+    recompute_solution_area_cage() {
+        this.solution_area_cage = [];
+        // override for each grid type
     }
 
     // Make various backwards compatibility patches to puzzle data after loading a puzzle in case
@@ -12691,6 +12698,10 @@ class Puzzle {
         this.ctx.closePath();
         this.ctx.stroke();
         this.ctx.fill();
+    }
+
+    draw_solution_area() {
+        return;
     }
 
     draw_conflicts() {
