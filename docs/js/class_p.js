@@ -12681,7 +12681,28 @@ class Puzzle {
     }
 
     draw_solution_area() {
-        return;
+        // Fallback implementation that simply shades cells inside the solution area. This does not distinguish
+        // between inclusive and exclusive solution areas. Override this with a cage-like presentation for each
+        // grid.
+        const draw_cell = (i) => {
+            if (this.point[i].surround.length == 0) {
+                return;
+            }
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.point[this.point[i].surround[0]].x, this.point[this.point[i].surround[0]].y);
+            for (var j = 1; j < this.point[i].surround.length; j++) {
+                this.ctx.lineTo(this.point[this.point[i].surround[j]].x, this.point[this.point[i].surround[j]].y);
+            }
+            this.ctx.closePath();
+            this.ctx.fill();
+            this.ctx.stroke();
+        }
+
+        for (var i = 0; i < this.solution_area.length; i++) {
+            set_surface_style(this.ctx, 14);
+            draw_cell(this.solution_area[i]);
+        }
     }
 
     draw_conflicts() {

@@ -658,6 +658,9 @@ class Puzzle_hex extends Puzzle {
             this.draw_cursol();
             this.draw_freecircle();
         }
+        if (UserSettings.show_solution_area) {
+            this.draw_solution_area();
+        }
     }
 
     draw_lattice() {
