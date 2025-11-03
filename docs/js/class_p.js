@@ -970,6 +970,10 @@ class Puzzle {
             }
         }
 
+        // Translate solution area
+        this.solution_area = this.solution_area.map(translate_fn);
+        this.recompute_solution_area_cage();
+
         // Translate solution
         if (this.solution) {
             let settingstatus_or = document.getElementById("answersetting").getElementsByClassName("solcheck_or");
