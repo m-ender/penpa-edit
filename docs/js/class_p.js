@@ -1610,6 +1610,11 @@ class Puzzle {
                     this[this.mode.qa + "_col"].wall = {};
                 }
                 break;
+            case "solution_area":
+                this.solution_area = [];
+                this.recompute_solution_area_cage();
+                this.redraw();
+                break;
             case "number":
                 if ((this.mode[this.mode.qa][this.mode[this.mode.qa].edit_mode][0] === "3") ||
                     (this.mode[this.mode.qa][this.mode[this.mode.qa].edit_mode][0] === "9")) {
