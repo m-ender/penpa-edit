@@ -1699,6 +1699,10 @@ onload = function() {
                 UserSettings.show_solution_area = !UserSettings.show_solution_area;
                 e.preventDefault();
                 break;
+            case "inclusive_solution_area_button":
+                pu.inclusive_solution_area = !pu.inclusive_solution_area;
+                e.preventDefault();
+                break;
             case "pu_q_label":
                 pu.mode_qa("pu_q");
                 e.preventDefault();
