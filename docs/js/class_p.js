@@ -9995,18 +9995,31 @@ class Puzzle {
 
     re_board(num) {
         var index = this.centerlist.indexOf(num);
+        var sol_index = this.solution_area.indexOf(num);
+        var solution_area_modified = false;
         if (index === -1) {
             this.centerlist.push(num);
+            if (this.solution_area.length > 0 && sol_index === -1) {
+                this.solution_area.push(num);
+                solution_area_modified = true;
+            }
             this.drawing_mode = 1;
         } else {
             let status = this.check_last_cell();
             if (!status) {
                 this.centerlist.splice(index, 1);
+                if (sol_index > -1) {
+                    this.solution_area.splice(sol_index, 1);
+                    solution_area_modified = true;
+                }
                 this.drawing_mode = 0;
             } else {
                 this.drawing = false;
                 this.last = -1
             }
+        }
+        if (solution_area_modified) {
+            this.recompute_solution_area_cage();
         }
         this.make_frameline();
         this.redraw();
@@ -10024,13 +10037,26 @@ class Puzzle {
     re_boardmove(num) {
         if (this.drawing && this.last != num) {
             var index = this.centerlist.indexOf(num);
+            var sol_index = this.solution_area.indexOf(num);
+            var solution_area_modified = false;
             if (this.drawing_mode === 1 && index === -1) {
                 this.centerlist.push(num);
+                if (this.solution_area.length > 0 && sol_index === -1) {
+                    this.solution_area.push(num);
+                    solution_area_modified = true;
+                }
             } else if (this.drawing_mode === 0 && index != -1) {
                 let status = this.check_last_cell();
                 if (!status) {
                     this.centerlist.splice(index, 1);
+                    if (sol_index > -1) {
+                        this.solution_area.splice(sol_index, 1);
+                        solution_area_modified = true;
+                    }
                 }
+            }
+            if (solution_area_modified) {
+                this.recompute_solution_area_cage();
             }
             this.make_frameline();
             this.redraw();
