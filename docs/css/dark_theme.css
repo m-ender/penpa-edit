@@ -278,6 +278,7 @@ a:active {
 }
 
 #visibility_button,
-#view_solution_area_button {
+#view_solution_area_button,
+#inclusive_solution_area_button {
     border: 1px solid var(--blueskyMedium);
 }

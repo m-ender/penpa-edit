@@ -183,7 +183,7 @@ class Puzzle {
         this.centerlist = [];
         this.solution = "";
         this.solution_area = [];
-        this.inclusive_solution_area = true; // Include boundary of solution area?
+        this._inclusive_solution_area = true; // Include boundary of solution area? (wrapped by get/set to update UI on changes)
         this.solution_area_cage = []; // list of pairs of coordinates to render a cage representing the solution area. not used for all grid types.
         this.sol_flag = 0;
         this.undoredo_counter = 0;
@@ -229,6 +229,19 @@ class Puzzle {
         document.addEventListener('copy', (e) => this.copy_handler(e));
         document.addEventListener('cut', (e) => this.cut_handler(e));
         document.addEventListener('paste', (e) => this.paste_handler(e));
+    }
+
+    set inclusive_solution_area(newValue) {
+        const button = document.getElementById("inclusive_solution_area_button");
+        this._inclusive_solution_area = newValue;
+        button.textContent = PenpaText.get(newValue ? "on" : "off");
+
+        this.recompute_solution_area_cage();
+        this.redraw();
+    }
+
+    get inclusive_solution_area() {
+        return this._inclusive_solution_area;
     }
 
     reset_puzzle(p) {
@@ -367,6 +380,7 @@ class Puzzle {
 
     reset_solution_area_to_centerlist() {
         this.solution_area = this.centerlist.slice();
+        this.inclusive_solution_area = true;
         this.recompute_solution_area_cage();
     }
 
@@ -1504,6 +1518,7 @@ class Puzzle {
         document.getElementById('style_lineE').style.display = 'none';
         document.getElementById('style_wall').style.display = 'none';
         document.getElementById('style_number').style.display = 'none';
+        document.getElementById('style_solution_area').style.display = 'none';
         document.getElementById('style_symbol').style.display = 'none';
         document.getElementById('style_special').style.display = 'none';
         document.getElementById('style_cage').style.display = 'none';

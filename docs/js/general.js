@@ -83,12 +83,13 @@ function create() {
 
     pu = make_class(gridtype);
     pu.reset_frame();
-    pu.reset_solution_area_to_centerlist();
-
+    
     // Drawing Panel
     panel_pu = new Panel();
     panel_pu.draw_panel();
     pu.mode_set("surface"); //include redraw
+
+    pu.reset_solution_area_to_centerlist();
 
     UserSettings.loadFromCookies("others");
 
@@ -224,11 +225,12 @@ function create_newboard() {
         }
 
         pu.reset_frame(); // Draw the board
-        pu.reset_solution_area_to_centerlist();
         panel_pu.draw_panel();
         document.getElementById('modal').style.display = 'none';
         pu.mode_set(pu.mode[pu.mode.qa].edit_mode); //include redraw
 
+        pu.reset_solution_area_to_centerlist();
+        
         // constraints
         if (gridtype === "square" || gridtype === "sudoku" || gridtype === "kakuro" || gridtype === "hex") {
             document.getElementById('constraints').style.display = 'inline';
@@ -3180,10 +3182,10 @@ function decode_puzzlink(url) {
 
     function setupProblem(puzzle, mode) {
         puzzle.reset_frame(); // Draw the board
-        puzzle.reset_solution_area_to_centerlist();
         panel_pu.draw_panel();
         document.getElementById('modal').style.display = 'none';
         puzzle.mode_set(mode); //include redraw
+        puzzle.reset_solution_area_to_centerlist();
     }
 
     var info_edge, info_number, info_obj, size, puzzlink_pu,
