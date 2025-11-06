@@ -815,6 +815,7 @@ class Puzzle {
         // Find the missing and added boxes
         let old_centerlist = this.centerlist;
         let old_idealcenterlist = []; // If no box was missing
+        let old_solution_area = this.solution_area;
         for (let j = 2 + originalspace[0]; j < originalny0 - 2 - originalspace[1]; j++) {
             for (let i = 2 + originalspace[2]; i < originalnx0 - 2 - originalspace[3]; i++) { // the top and left edges are unused
                 old_idealcenterlist.push(i + j * originalnx0);
@@ -822,6 +823,8 @@ class Puzzle {
         }
         let boxremove = old_idealcenterlist.filter(x => old_centerlist.indexOf(x) === -1);
         let boxadd = old_centerlist.filter(x => old_idealcenterlist.indexOf(x) === -1);
+        let solution_area_remove = old_idealcenterlist.filter(x => old_solution_area.indexOf(x) === -1);
+        let solution_area_add = old_solution_area.filter(x => old_idealcenterlist.indexOf(x) === -1);
 
         this.create_point();
         this.centerlist = [];
@@ -849,9 +852,13 @@ class Puzzle {
 
         // Reset centerlist to match the margins
         this.centerlist = []
+        this.solution_area = [];
         for (let j = 2 + this.space[0]; j < this.ny0 - 2 - this.space[1]; j++) {
             for (let i = 2 + this.space[2]; i < this.nx0 - 2 - this.space[3]; i++) { // the top and left edges are unused
                 this.centerlist.push(i + j * (this.nx0));
+                if (old_solution_area.length > 0) {
+                    this.solution_area.push(i + j * (this.nx0));
+                }
             }
         }
 
@@ -876,6 +883,25 @@ class Puzzle {
         }
 
         this.make_frameline();
+        // Remove Solution Area elements
+        for (let n = 0; n < solution_area_remove.length; n++) {
+            let num = solution_area_remove[n];
+            let m = translate_fn(num);
+            let index = this.solution_area.indexOf(m);
+            if (index !== -1) {
+                this.solution_area.splice(index, 1);
+            }
+        }
+        // Add Solution Area elements
+        for (let n = 0; n < solution_area_add.length; n++) {
+            let num = solution_area_add[n];
+            let m = translate_fn(num);
+            let index = this.solution_area.indexOf(m);
+            if (index === -1) {
+                this.solution_area.push(m);
+            }
+        }
+        this.recompute_solution_area_cage();
         this.translate_puzzle_elements(translate_fn);
     }
 
@@ -969,10 +995,6 @@ class Puzzle {
                 }
             }
         }
-
-        // Translate solution area
-        this.solution_area = this.solution_area.map(translate_fn);
-        this.recompute_solution_area_cage();
 
         // Translate solution
         if (this.solution) {
