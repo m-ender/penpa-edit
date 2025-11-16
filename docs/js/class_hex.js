@@ -60,7 +60,7 @@ class Puzzle_hex extends Puzzle {
                 adjacent = [k + n ** 2, k + n ** 2 + 1, k + n ** 2 + n + j % 2];
                 surround = [k - n ** 2, k - n ** 2 + n - 1 + j % 2, k - n ** 2 + n + j % 2];
                 edge_to_vertex = [k + 2 * n ** 2, k + 3 * n ** 2, k + 4 * n ** 2 + n - 1 + j % 2];
-                point[k] = new Point(point[i + j * n].x, point[i + j * n].y + 2 / 3 * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex);
+                point[k] = new Point(point[i + j * n].x, point[i + j * n].y + 2 / 3 * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex, 3);
                 k++;
             }
         }
@@ -70,7 +70,7 @@ class Puzzle_hex extends Puzzle {
                 adjacent = [k - n ** 2 - n - (j + 1) % 2, k - n ** 2 - 1, k - n ** 2];
                 surround = [k - 2 * n ** 2 - 1, k - 2 * n ** 2, k - 2 * n ** 2 + n - 1 + j % 2];
                 edge_to_vertex = [k + n ** 2, k + 2 * n ** 2 - 1, k + 3 * n ** 2 - 1];
-                point[k] = new Point(point[i + j * n].x - 0.5 * this.size, point[i + j * n].y + 1 / 3 * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex);
+                point[k] = new Point(point[i + j * n].x - 0.5 * this.size, point[i + j * n].y + 1 / 3 * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex, 3);
                 k++;
             }
         }
@@ -189,6 +189,16 @@ class Puzzle_hex extends Puzzle {
         this.canvas_size_setting();
         this.point_move((this.canvasx * 0.5 - this.point[this.center_n].x + 0.5), (this.canvasy * 0.5 - this.point[this.center_n].y + 0.5), this.theta);
         this.make_frameline();
+    }
+
+    cell_to_subnodes(cell) {
+        if (!this.point[cell] || this.point[cell].type !== 0) {
+            return [];
+        }
+
+        let first_side = 6 * (this.nx * 3 + 1) * (this.nx * 3 + 1) + 6 * cell;
+        let first_corner = 12 * (this.nx * 3 + 1) * (this.nx * 3 + 1) + 6 * cell;
+        return [first_side, first_side+1, first_side+2, first_side+3, first_side+4, first_side+5, first_corner, first_corner+1, first_corner+2, first_corner+3, first_corner+4, first_corner+5];
     }
 
     type_set() {

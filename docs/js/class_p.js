@@ -1,7 +1,7 @@
 const MAX_EXPORT_LENGTH = 7360;
 
 class Point {
-    constructor(x, y, type, adjacent, surround, use, neighbor = [], adjacent_dia = [], type2 = 0, index = null, edge_to_vertex = []) {
+    constructor(x, y, type, adjacent, surround, use, neighbor = [], adjacent_dia = [], type2 = 0, index = null, edge_to_vertex = [], degree = 0) {
         this.x = x;
         this.y = y;
         this.type = type;
@@ -13,6 +13,7 @@ class Point {
         this.edge_to_vertex = edge_to_vertex;
         this.use = use;
         this.index = index;
+        this.degree = degree; // Only for type 1 (vertices). Number of edges the vertex would have on an infinite grid.
     }
 }
 
@@ -186,6 +187,7 @@ class Puzzle {
         this.solution_area = [];
         this._inclusive_solution_area = true; // Include boundary of solution area? (wrapped by get/set to update UI on changes)
         this.solution_area_cage = []; // list of pairs of coordinates to render a cage representing the solution area. not used for all grid types.
+        this.solution_checked_points = {}; // only used when in solve mode with answer check
         this.sol_flag = 0;
         this.undoredo_counter = 0;
         this.loop_counter = false;
@@ -388,6 +390,53 @@ class Puzzle {
     recompute_solution_area_cage() {
         this.solution_area_cage = [];
         // override for each grid type
+    }
+
+    recompute_solution_checked_points() {
+        this.solution_checked_points = {};
+        let vertices = {};
+        let edges = {};
+
+        for (let cell of this.solution_area) {
+            this.solution_checked_points[cell] = true;
+
+            for (let sub of this.cell_to_subnodes(cell)) {
+                this.solution_checked_points[sub] = true;
+            }
+
+            for (let vertex of this.point[cell].surround) {
+                if (vertices[vertex]) {
+                    ++vertices[vertex];
+                } else {
+                    vertices[vertex] = 1;
+                }
+            }
+
+            for (let edge of this.point[cell].neighbor) {
+                if (edges[edge]) {
+                    ++edges[edge];
+                } else {
+                    edges[edge] = 1;
+                }
+            }
+        }
+
+        for (let edge in edges) {
+            if (this.inclusive_solution_area || edges[edge] === 2) {
+                this.solution_checked_points[edge] = true;
+            }
+        }
+
+        for (let vertex in vertices) {
+            if (this.inclusive_solution_area || vertices[vertex] === this.point[vertex].degree) {
+                this.solution_checked_points[vertex] = true;
+            }
+        }
+    }
+
+    // Given a cell-centre point, returns a list of sub nodes for placing small numbers. Override for each grid type.
+    cell_to_subnodes(cell) {
+        return [];
     }
 
     // Make various backwards compatibility patches to puzzle data after loading a puzzle in case

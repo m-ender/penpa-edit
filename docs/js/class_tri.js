@@ -46,7 +46,7 @@ class Puzzle_tri extends Puzzle {
                 adjacent = [k - n - 1 + j % 2, k - n + j % 2, k - 1, k + 1, k + n - 1 + j % 2, k + n + j % 2];
                 surround = [k + n ** 2 - n - 1 + j % 2, k + 2 * n ** 2 - n + j % 2, k + n ** 2 - n + j % 2, k + 2 * n ** 2 + 1, k + n ** 2, k + 2 * n ** 2];
                 edge_to_vertex = [k + 3 * n ** 2 - n + j % 2, k + 3 * n ** 2, k + 4 * n ** 2 - n - 1 + j % 2, k + 4 * n ** 2, k + 5 * n ** 2 - 1, k + 5 * n ** 2];
-                point[k] = new Point((i + (j % 2) * 0.5 - (1 + 0.5 * ((this.nx + 1) % 2))) * this.size, (j - 1) * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex);
+                point[k] = new Point((i + (j % 2) * 0.5 - (1 + 0.5 * ((this.nx + 1) % 2))) * this.size, (j - 1) * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, edge_to_vertex, 6);
                 k++;
             }
         }
@@ -192,6 +192,27 @@ class Puzzle_tri extends Puzzle {
         this.canvas_size_setting();
         this.point_move((this.canvasx * 0.5 - this.point[this.center_n].x + 0.5), (this.canvasy * 0.5 - this.point[this.center_n].y + 0.5), this.theta);
         this.make_frameline();
+    }
+
+    cell_to_subnodes(cell) {
+        if (!this.point[cell] || this.point[cell].type !== 0) {
+            return [];
+        }
+
+        let subnodes = [];
+        for (let vertex of this.point[cell].surround) {
+            if (!this.point[vertex] || this.point[vertex].type !== 1) {
+                continue;
+            }
+
+            let index = this.point[vertex].surround.indexOf(cell);
+            let sub_index = [0, 2, 1, 5, 3, 4][index];
+            subnodes.push(12 * this.n0 * this.n0 + 6 * vertex + sub_index);
+        }
+
+        // This excludes the first batch of subnodes, which fall onto the edges of the grid and cannot normally be used with the current UI
+
+        return subnodes;
     }
 
     type_set() {
