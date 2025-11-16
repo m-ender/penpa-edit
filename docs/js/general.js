@@ -2392,10 +2392,8 @@ function load(urlParam, type = 'url', origurl = null) {
             pu.inclusive_solution_area = true;
         }
     }
+    pu.solution_area_dirty = true;
     pu.recompute_solution_area_cage();
-    if (pu.solution) {
-        pu.recompute_solution_checked_points();
-    }
 
     pu.mode_set(pu.mode[pu.mode.qa].edit_mode, 'url'); //includes redraw
 
@@ -2687,6 +2685,7 @@ function loadver1(paramArray, rtext) {
         }
         pu.inclusive_solution_area = true;
     }
+    pu.solution_area_dirty = true;
     pu.recompute_solution_area_cage();
 
     pu.centerlist = pre_centerlist;
