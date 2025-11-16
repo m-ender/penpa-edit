@@ -2393,6 +2393,9 @@ function load(urlParam, type = 'url', origurl = null) {
         }
     }
     pu.recompute_solution_area_cage();
+    if (pu.solution) {
+        pu.recompute_solution_checked_points();
+    }
 
     pu.mode_set(pu.mode[pu.mode.qa].edit_mode, 'url'); //includes redraw
 

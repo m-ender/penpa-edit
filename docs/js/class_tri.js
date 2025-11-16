@@ -38,18 +38,18 @@ class Puzzle_tri extends Puzzle {
         var adjacent, surround, type, use, neighbor;
         var point = [];
         const index = (x, y, t) => [x, y, t];
-        //center
+        //vertex
         type = 1;
         for (var j = 0; j < n; j++) {
             for (var i = 0; i < n; i++) {
                 if (i === 0 || i === n - 1 || j === 0 || j === n - 1) { use = -1; } else { use = 1; }
                 adjacent = [k - n - 1 + j % 2, k - n + j % 2, k - 1, k + 1, k + n - 1 + j % 2, k + n + j % 2];
                 surround = [k + n ** 2 - n - 1 + j % 2, k + 2 * n ** 2 - n + j % 2, k + n ** 2 - n + j % 2, k + 2 * n ** 2 + 1, k + n ** 2, k + 2 * n ** 2];
-                point[k] = new Point((i + (j % 2) * 0.5 - (1 + 0.5 * ((this.nx + 1) % 2))) * this.size, (j - 1) * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use);
+                point[k] = new Point((i + (j % 2) * 0.5 - (1 + 0.5 * ((this.nx + 1) % 2))) * this.size, (j - 1) * this.size * Math.sqrt(3) * 0.5, type, adjacent, surround, use, [], [], 0, null, 6);
                 k++;
             }
         }
-        //vertex
+        //center
         type = 0;
         for (var j = 0; j < n; j++) {
             for (var i = 0; i < n; i++) {
@@ -188,6 +188,27 @@ class Puzzle_tri extends Puzzle {
         this.canvas_size_setting();
         this.point_move((this.canvasx * 0.5 - this.point[this.center_n].x + 0.5), (this.canvasy * 0.5 - this.point[this.center_n].y + 0.5), this.theta);
         this.make_frameline();
+    }
+
+    cell_to_subnodes(cell) {
+        if (!this.point[cell] || this.point[cell].type !== 0) {
+            return [];
+        }
+
+        let subnodes = [];
+        for (let vertex of this.point[cell].surround) {
+            if (!this.point[vertex] || this.point[vertex].type !== 1) {
+                continue;
+            }
+
+            let index = this.point[vertex].surround.indexOf(cell);
+            let sub_index = [0, 2, 1, 5, 3, 4][index];
+            subnodes.push(12 * this.n0 * this.n0 + 6 * vertex + sub_index);
+        }
+
+        // This excludes the first batch of subnodes, which fall onto the edges of the grid and cannot normally be used with the current UI
+
+        return subnodes;
     }
 
     type_set() {

@@ -72,7 +72,7 @@ class Puzzle_square extends Puzzle {
                 adjacent = [k - nx, k - 1, k + 1, k + nx];
                 adjacent_dia = [k - nx - 1, k - nx + 1, k + nx - 1, k + nx + 1];
                 surround = [];
-                point[k] = new Point(point[i + j * nx].x + 0.5 * this.size, point[i + j * nx].y + 0.5 * this.size, type, adjacent, surround, use, [], adjacent_dia, 0, index(i, j));
+                point[k] = new Point(point[i + j * nx].x + 0.5 * this.size, point[i + j * nx].y + 0.5 * this.size, type, adjacent, surround, use, [], adjacent_dia, 0, index(i, j), 4);
                 k++;
             }
         }
@@ -270,6 +270,16 @@ class Puzzle_square extends Puzzle {
                 } // no need to check short borders, because they've been checked from the other side
             }
         }
+    }
+
+    cell_to_subnodes(cell) {
+        if (!this.point[cell] || this.point[cell].type !== 0) {
+            return [];
+        }
+
+        let first_corner = 4 * this.nx0 * this.ny0 + 4 * cell;
+        let first_side = 8 * this.nx0 * this.ny0 + 4 * cell;
+        return [first_corner, first_corner+1, first_corner+2, first_corner+3, first_side, first_side+1, first_side+2, first_side+3];
     }
 
     type_set() {
