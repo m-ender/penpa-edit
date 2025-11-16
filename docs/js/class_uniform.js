@@ -1137,14 +1137,23 @@ class Puzzle_truncated_square extends Puzzle {
                     }
                     break;
                 case "8": //long
-                    if (this[pu].number[i][1] === 5) {
-                        set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                        set_circle_style(this.ctx, 7);
-                        this.ctx.fillRect(p_x - 0.2 * this.size, p_y - 0.25 * this.size, this.ctx.measureText(this[pu].number[i][0]).width, 0.5 * this.size);
+                    {
+                        let number_data = this[pu].number[i];
+                        let lines = number_data[0].split('\n');
+                        let p_x = this.point[i].x;
+                        let p_y = this.point[i].y;
+                        for (let line of lines) {
+                            if (number_data[1] === 5) {
+                                set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                                set_circle_style(this.ctx, 7);
+                                this.ctx.fillRect(p_x - 0.2 * this.size, p_y - 0.25 * this.size, this.ctx.measureText(line).width, 0.5 * this.size);
+                            }
+                            set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                            this.ctx.textAlign = "left";
+                            this.ctx.text(line, p_x - 0.2 * this.size, p_y);
+                            p_y += this.size * 0.5;
+                        }
                     }
-                    set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                    this.ctx.textAlign = "left";
-                    this.ctx.text(this[pu].number[i][0], p_x - 0.2 * this.size, p_y);
                     break;
             }
         }
@@ -5333,14 +5342,23 @@ class Puzzle_iso extends Puzzle_truncated_square {
                     }
                     break;
                 case "8": //long
-                    if (this[pu].number[i][1] === 5) {
-                        set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                        set_circle_style(this.ctx, 7);
-                        this.ctx.fillRect(this.point[i].x - 0.2 * this.size, this.point[i].y - 0.25 * this.size, this.ctx.measureText(this[pu].number[i][0]).width, 0.5 * this.size);
+                    {
+                        let number_data = this[pu].number[i];
+                        let lines = number_data[0].split('\n');
+                        let p_x = this.point[i].x;
+                        let p_y = this.point[i].y;
+                        for (let line of lines) {
+                            if (number_data[1] === 5) {
+                                set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                                set_circle_style(this.ctx, 7);
+                                this.ctx.fillRect(p_x - 0.2 * this.size, p_y - 0.25 * this.size, this.ctx.measureText(line).width, 0.5 * this.size);
+                            }
+                            set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                            this.ctx.textAlign = "left";
+                            this.ctx.text(line, p_x - 0.2 * this.size, p_y);
+                            p_y += this.size * 0.5;
+                        }
                     }
-                    set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                    this.ctx.textAlign = "left";
-                    this.ctx.text(this[pu].number[i][0], this.point[i].x - 0.2 * this.size, this.point[i].y);
                     break;
             }
         }
@@ -8054,14 +8072,23 @@ class Puzzle_penrose_P3 extends Puzzle {
                     }
                     break;
                 case "8": //long
-                    if (this[pu].number[i][1] === 5) {
-                        set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                        set_circle_style(this.ctx, 7);
-                        this.ctx.fillRect(p_x - 0.2 * this.size, p_y - 0.25 * this.size, this.ctx.measureText(this[pu].number[i][0]).width, 0.5 * this.size);
+                    {
+                        let number_data = this[pu].number[i];
+                        let lines = number_data[0].split('\n');
+                        let p_x = this.point[i].x;
+                        let p_y = this.point[i].y;
+                        for (let line of lines) {
+                            if (number_data[1] === 5) {
+                                set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                                set_circle_style(this.ctx, 7);
+                                this.ctx.fillRect(p_x - 0.2 * this.size, p_y - 0.25 * this.size, this.ctx.measureText(line).width, 0.5 * this.size);
+                            }
+                            set_font_style(this.ctx, 0.5 * this.size.toString(10), number_data[1]);
+                            this.ctx.textAlign = "left";
+                            this.ctx.text(line, p_x - 0.2 * this.size, p_y);
+                            p_y += this.size * 0.5;
+                        }
                     }
-                    set_font_style(this.ctx, 0.5 * this.size.toString(10), this[pu].number[i][1]);
-                    this.ctx.textAlign = "left";
-                    this.ctx.text(this[pu].number[i][0], p_x - 0.2 * this.size, p_y);
                     break;
             }
         }
