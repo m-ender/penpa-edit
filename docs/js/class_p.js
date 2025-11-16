@@ -7790,8 +7790,8 @@ class Puzzle {
                         } else {
                             con = "";
                         }
-                        // Length limit of 10 except for Long submode which has 50
-                        const limit = (submode[0] === "8") ? 50 : 10;
+                        // Length limit of 10 except for Long submode which has 1000
+                        const limit = (submode[0] === "8") ? 1000 : 10;
                         if (con.length < limit) {
                             number = con + key;
                             this.set_value("number", k, [number, submode[1], submode[0]]);
