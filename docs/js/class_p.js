@@ -187,7 +187,8 @@ class Puzzle {
         this.solution_area = [];
         this._inclusive_solution_area = true; // Include boundary of solution area? (wrapped by get/set to update UI on changes)
         this.solution_area_cage = []; // list of pairs of coordinates to render a cage representing the solution area. not used for all grid types.
-        this.solution_checked_points = {}; // only used when in solve mode with answer check
+        this.solution_area_dirty = false; // determines whether to recompute solution_checked_points
+        this.solution_checked_points = {};
         this.sol_flag = 0;
         this.undoredo_counter = 0;
         this.loop_counter = false;
@@ -239,8 +240,9 @@ class Puzzle {
         this._inclusive_solution_area = newValue;
         button.textContent = PenpaText.get(newValue ? "on" : "off");
 
+        this.solution_area_dirty = true;
         this.recompute_solution_area_cage();
-        this.redraw();
+        this.redraw(true, false);
     }
 
     get inclusive_solution_area() {
@@ -384,6 +386,7 @@ class Puzzle {
     reset_solution_area_to_centerlist() {
         this.solution_area = this.centerlist.slice();
         this.inclusive_solution_area = true;
+        this.solution_area_dirty = true;
         this.recompute_solution_area_cage();
     }
 
@@ -393,6 +396,9 @@ class Puzzle {
     }
 
     recompute_solution_checked_points() {
+        if (!this.solution_area_dirty || !this.point || this.point.length === 0) {
+            return;
+        }
         this.solution_checked_points = {};
         let vertices = {};
         let edges = {};
@@ -432,6 +438,8 @@ class Puzzle {
                 this.solution_checked_points[vertex] = true;
             }
         }
+
+        this.solution_area_dirty = false;
     }
 
     // Given a cell-centre point, returns a list of sub nodes for placing small numbers. Override for each grid type.
@@ -950,6 +958,7 @@ class Puzzle {
                 this.solution_area.push(m);
             }
         }
+        this.solution_area_dirty = true;
         this.recompute_solution_area_cage();
         this.translate_puzzle_elements(translate_fn);
     }
@@ -1687,6 +1696,7 @@ class Puzzle {
                 break;
             case "solution_area":
                 this.solution_area = [];
+                this.solution_area_dirty = true;
                 this.recompute_solution_area_cage();
                 this.redraw();
                 break;
@@ -2272,6 +2282,9 @@ class Puzzle {
         let solution = [];
         let pu = this.pu_a;
         for (var i in pu.surface) {
+            if (!this.solution_checked_points[i]) {
+                continue;
+            }
             // Exact surface colors
             if (surface_exact) {
                 // Make the solution slightly smaller by adding multicolor directly into the parent array
@@ -2324,11 +2337,14 @@ class Puzzle {
         };
 
         for (var i in pu.line) {
+            let cells = i.split(",");
+            if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                continue;
+            }
             // Ignoring the half cells standred line marks
             // [ZW] Not sure about the logic for this either, why is this only
             // done if "ignore given line segments" is *not* checked?
             if (!line_ignore) {
-                let cells = i.split(",");
                 if (this.cellsoutsideFrame.includes(parseInt(cells[0])) &&
                     this.cellsoutsideFrame.includes(parseInt(cells[1]))) {
                     continue;
@@ -2337,8 +2353,13 @@ class Puzzle {
             check_line(i, 'line');
         }
 
-        for (var i in pu.freeline)
+        for (var i in pu.freeline) {
+            let cells = i.split(",");
+            if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                continue;
+            }
             check_line(i, 'freeline');
+        }
 
         return solution;
     }
@@ -2373,11 +2394,21 @@ class Puzzle {
                 solution.push(i + ",2");
         };
 
-        for (var i in pu.lineE)
+        for (var i in pu.lineE) {
+            let cells = i.split(",");
+            if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                continue;
+            }
             check_edge(i, 'lineE');
+        }
 
-        for (var i in pu.freelineE)
+        for (var i in pu.freelineE) {
+            let cells = i.split(",");
+            if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                continue;
+            }
             check_edge(i, 'freelineE');
+        }
 
         let found = $('#genre_tags_opt').select2("val").some(r => this.surface_2_edge_types.includes(r));
         if (found && this.gridtype === 'square') {
@@ -2420,6 +2451,10 @@ class Puzzle {
                         if (pu.surface[present_cell] &&
                             pu.surface[right_cell] &&
                             (pu.surface[present_cell] !== pu.surface[right_cell])) {
+
+                            if (!this.solution_checked_points[this.point[present_cell].surround[1]] && !this.solution_checked_points[this.point[present_cell].surround[2]]) {
+                                continue;
+                            }
                             let imp_edge = this.point[present_cell].surround[1] + ',' + this.point[present_cell].surround[2];
                             if (this["pu_q"].lineE[imp_edge] && this["pu_q"].lineE[imp_edge] === 2) {
                                 // ignore given edges
@@ -2432,6 +2467,10 @@ class Puzzle {
                         if (pu.surface[present_cell] &&
                             pu.surface[down_cell] &&
                             (pu.surface[present_cell] !== pu.surface[down_cell])) {
+
+                            if (!this.solution_checked_points[this.point[present_cell].surround[3]] && !this.solution_checked_points[this.point[present_cell].surround[2]]) {
+                                continue;
+                            }
                             let imp_edge = this.point[present_cell].surround[3] + ',' + this.point[present_cell].surround[2];
                             if (this["pu_q"].lineE[imp_edge] && this["pu_q"].lineE[imp_edge] === 2) {
                                 // ignore given edges
@@ -2449,6 +2488,8 @@ class Puzzle {
 
     make_solution() {
         let checkall = this.checkall_status();
+
+        this.recompute_solution_checked_points();
 
         if (!this.multisolution) {
             let surface_exact = document.getElementById("sol_surface_exact").checked;
@@ -2482,6 +2523,9 @@ class Puzzle {
             // Why on earth is this put in the same list as the surface information?
             if (document.getElementById("sol_square").checked === true || checkall) {
                 for (var i in this[pu].symbol) {
+                    if (!this.solution_checked_points[i]) {
+                        continue;
+                    }
                     if (this[pu].symbol[i][0] === 2 && this[pu].symbol[i][1] === "square_LL") {
                         if (sol[0].indexOf(i) === -1) {
                             sol[0].push(i);
@@ -2509,6 +2553,10 @@ class Puzzle {
 
             if (document.getElementById("sol_wall").checked === true || checkall) {
                 for (var i in this[pu].wall) {
+                    let cells = i.split(",");
+                    if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                        continue;
+                    }
                     if (this[pu].wall[i] === 3) {
                         sol[3].push(i);
                     }
@@ -2517,6 +2565,9 @@ class Puzzle {
 
             if (document.getElementById("sol_number").checked === true || checkall) {
                 for (var i in this[pu].number) {
+                    if (!this.solution_checked_points[i]) {
+                        continue;
+                    }
                     if (this["pu_q"].number[i] && this["pu_q"].number[i][1] === 1 && (this["pu_q"].number[i][2] === "1" || this["pu_q"].number[i][2] === "10")) {
                         // (Black) and (Normal or L) in Problem mode then ignore
                     } else {
@@ -2562,6 +2613,9 @@ class Puzzle {
                 // Tight Fit Sudoku
                 if ($('#genre_tags_opt').select2("val").includes("tightfit")) {
                     for (var i in this[pu].numberS) {
+                        if (!this.solution_checked_points[i]) {
+                            continue;
+                        }
                         if (!isNaN(this[pu].numberS[i][0]) || !this[pu].numberS[i][0].match(/[^A-Za-z]+/)) {
                             // (Green or light blue or dark blue or red)
                             if ((this[pu].numberS[i][1] === 2 || this[pu].numberS[i][1] === 8 || this[pu].numberS[i][1] === 9 || this[pu].numberS[i][1] === 10)) {
@@ -2573,6 +2627,9 @@ class Puzzle {
             }
 
             for (var i in this[pu].symbol) {
+                if (!this.solution_checked_points[i]) {
+                    continue;
+                }
                 switch (this[pu].symbol[i][1]) {
                     case "circle_M":
                         if (document.getElementById("sol_circle").checked === true || checkall) {
@@ -2679,6 +2736,9 @@ class Puzzle {
                         break;
                     case "number":
                         for (var i in this[pu].number) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this["pu_q"].number[i] && this["pu_q"].number[i][1] === 1 && (this["pu_q"].number[i][2] === "1" || this["pu_q"].number[i][2] === "10")) {
                                 // (Black) and (Normal or L) in Problem mode then ignore
                             } else {
@@ -2724,6 +2784,9 @@ class Puzzle {
                         // Tight Fit Sudoku
                         if ($('#genre_tags_opt').select2("val").includes("tightfit")) {
                             for (var i in this[pu].numberS) {
+                                if (!this.solution_checked_points[i]) {
+                                    continue;
+                                }
                                 if (!isNaN(this[pu].numberS[i][0]) || !this[pu].numberS[i][0].match(/[^A-Za-z]+/)) {
                                     // (Green or light blue or dark blue or red)
                                     if ((this[pu].numberS[i][1] === 2 || this[pu].numberS[i][1] === 8 || this[pu].numberS[i][1] === 9 || this[pu].numberS[i][1] === 10)) {
@@ -2748,6 +2811,10 @@ class Puzzle {
                         break;
                     case "wall":
                         for (var i in this[pu].wall) {
+                            let cells = i.split(",");
+                            if (!this.solution_checked_points[cells[0]] && !this.solution_checked_points[cells[1]]) {
+                                continue;
+                            }
                             if (this[pu].wall[i] === 3) {
                                 temp_sol.push(i);
                             }
@@ -2756,6 +2823,9 @@ class Puzzle {
                         break;
                     case "square":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "square_LL" && this[pu].symbol[i][0] === 2) {
                                 temp_sol.push(i);
                             }
@@ -2764,6 +2834,9 @@ class Puzzle {
                         break;
                     case "circle":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "circle_M" &&
                                 this[pu].symbol[i][0] >= 1 && this[pu].symbol[i][0] <= 2) {
                                 temp_sol.push(i);
@@ -2773,6 +2846,9 @@ class Puzzle {
                         break;
                     case "tri":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "tri" &&
                                 this[pu].symbol[i][0] >= 1 && this[pu].symbol[i][0] <= 4) {
                                 temp_sol.push(i);
@@ -2782,6 +2858,9 @@ class Puzzle {
                         break;
                     case "arrow":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "arrow_S" &&
                                 this[pu].symbol[i][0] >= 1 && this[pu].symbol[i][0] <= 8) {
                                 temp_sol.push(i);
@@ -2791,6 +2870,9 @@ class Puzzle {
                         break;
                     case "math":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if ((this[pu].symbol[i][1] === "math" || this[pu].symbol[i][1] === "math_G") &&
                                 (this[pu].symbol[i][0] === 2 || this[pu].symbol[i][0] === 3)) {
                                 temp_sol.push(i + "," + this[pu].symbol[i][0]);
@@ -2800,6 +2882,9 @@ class Puzzle {
                         break;
                     case "battleship":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if ((this[pu].symbol[i][1] === "battleship_B" &&
                                     this[pu].symbol[i][0] >= 1 && this[pu].symbol[i][0] <= 6) ||
                                 (this[pu].symbol[i][1] === "battleship_B+" &&
@@ -2811,6 +2896,9 @@ class Puzzle {
                         break;
                     case "tent":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "tents" &&
                                 this[pu].symbol[i][0] === 2) {
                                 temp_sol.push(i);
@@ -2820,6 +2908,9 @@ class Puzzle {
                         break;
                     case "star":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "star" &&
                                 this[pu].symbol[i][0] >= 1 && this[pu].symbol[i][0] <= 3) {
                                 temp_sol.push(i);
@@ -2829,6 +2920,9 @@ class Puzzle {
                         break;
                     case "akari":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "sun_moon" &&
                                 this[pu].symbol[i][0] === 3) {
                                 temp_sol.push(i);
@@ -2838,6 +2932,9 @@ class Puzzle {
                         break;
                     case "mine":
                         for (var i in this[pu].symbol) {
+                            if (!this.solution_checked_points[i]) {
+                                continue;
+                            }
                             if (this[pu].symbol[i][1] === "sun_moon" &&
                                 (this[pu].symbol[i][0] === 4 || this[pu].symbol[i][0] === 5)) {
                                 temp_sol.push(i);
@@ -10094,6 +10191,7 @@ class Puzzle {
             }
         }
         if (solution_area_modified) {
+            this.solution_area_dirty = true;
             this.recompute_solution_area_cage();
         }
         this.make_frameline();
@@ -10131,6 +10229,7 @@ class Puzzle {
                 }
             }
             if (solution_area_modified) {
+                this.solution_area_dirty = true;
                 this.recompute_solution_area_cage();
             }
             this.make_frameline();
@@ -10167,6 +10266,7 @@ class Puzzle {
             this.solution_area.splice(index, 1);
             this.drawing_mode = 0;
         }
+        this.solution_area_dirty = true;
         this.recompute_solution_area_cage();
         this.redraw();
     }
@@ -10179,6 +10279,7 @@ class Puzzle {
             } else if (this.drawing_mode === 0 && index != -1) {
                 this.solution_area.splice(index, 1);
             }
+            this.solution_area_dirty = true;
             this.recompute_solution_area_cage();
             this.redraw();
         }
