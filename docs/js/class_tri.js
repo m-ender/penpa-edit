@@ -530,7 +530,7 @@ class Puzzle_tri extends Puzzle {
             this.draw_cursol();
             this.draw_freecircle();
         }
-        if (UserSettings.show_solution_area) {
+        if (this.mode[present_mode].edit_mode === "solution_area" || UserSettings.show_solution_area) {
             this.draw_solution_area();
         }
     }
