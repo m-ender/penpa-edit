@@ -1767,10 +1767,11 @@ class Puzzle {
 
     __export_list_tab_shared() {
         var list = [];
-        if (this.centerlist.length > 0) {
-            list.push(this.centerlist[0]);
-            for (var i = 1; i < this.centerlist.length; i++) {
-                list.push(this.centerlist[i] - this.centerlist[i - 1]);
+        let centerlist = this.centerlist.sort((a,b) => a - b);
+        if (centerlist.length > 0) {
+            list.push(centerlist[0]);
+            for (var i = 1; i < centerlist.length; i++) {
+                list.push(centerlist[i] - centerlist[i - 1]);
             }
         }
         var text = JSON.stringify(list) + "\n";
@@ -1833,10 +1834,11 @@ class Puzzle {
 
     __export_solution_area_shared() {
         let list = [];
-        if (this.solution_area.length > 0) {
-            list.push(this.solution_area[0]);
-            for (let i = 1; i < this.solution_area.length; i++) {
-                list.push(this.solution_area[i] - this.solution_area[i - 1]);
+        let solution_area = this.solution_area.sort((a,b) => a - b);
+        if (solution_area.length > 0) {
+            list.push(solution_area[0]);
+            for (let i = 1; i < solution_area.length; i++) {
+                list.push(solution_area[i] - solution_area[i - 1]);
             }
         }
         let text = JSON.stringify(list) + "\n";
