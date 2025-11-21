@@ -185,7 +185,7 @@ class Puzzle {
         this.solution = "";
         this.solution_area = [];
         this._inclusive_solution_area = true; // Include boundary of solution area? (wrapped by get/set to update UI on changes)
-        this.solution_area_cage = []; // list of pairs of coordinates to render a cage representing the solution area. not used for all grid types.
+        this.solution_area_outline = []; // list of pairs of coordinates to render the solution area outline.
         this.solution_area_dirty = false; // determines whether to recompute solution_checked_points
         this.solution_checked_points = {};
         this.sol_flag = 0;
@@ -240,8 +240,7 @@ class Puzzle {
         button.textContent = PenpaText.get(newValue ? "on" : "off");
 
         this.solution_area_dirty = true;
-        this.recompute_solution_area_cage();
-        this.redraw(true, false);
+        this.redraw();
     }
 
     get inclusive_solution_area() {
@@ -386,12 +385,39 @@ class Puzzle {
         this.solution_area = this.centerlist.slice();
         this.inclusive_solution_area = true;
         this.solution_area_dirty = true;
-        this.recompute_solution_area_cage();
+        this.recompute_solution_area_outline();
     }
 
-    recompute_solution_area_cage() {
-        this.solution_area_cage = [];
-        // override for each grid type
+    recompute_solution_area_outline() {
+        this.solution_area_outline = [];
+
+        if (this.solution_area.length === 0 || !this.point || this.point.length === 0) {
+            return;
+        }
+        
+        var max, min, key, corner;
+        var outline = {};
+        for (var j = 0; j < this.solution_area.length; j++) {
+            const p = this.solution_area[j];
+            corner = this.point[p].surround.length;
+            for (var i = 0; i < corner; i++) {
+                max = Math.max(this.point[p].surround[i], this.point[p].surround[(i + 1) % corner]);
+                min = Math.min(this.point[p].surround[i], this.point[p].surround[(i + 1) % corner]);
+                key = min.toString() + "," + max.toString();
+                if (outline[key]) {
+                    outline[key] = 0; // Line is between solution area cells, remove from outline
+                } else {
+                    outline[key] = p;
+                }
+            }
+        }
+
+        Object.keys(outline).forEach((k) => {
+            if (outline[k] !== 0) {   
+                const seg = k.split(",");
+                this.solution_area_outline.push([parseInt(seg[0]), parseInt(seg[1])]);
+           }
+        });
     }
 
     recompute_solution_checked_points() {
@@ -935,7 +961,7 @@ class Puzzle {
             }
         }
         this.solution_area_dirty = true;
-        this.recompute_solution_area_cage();
+        this.recompute_solution_area_outline();
         this.translate_puzzle_elements(translate_fn);
     }
 
@@ -1673,7 +1699,7 @@ class Puzzle {
             case "solution_area":
                 this.solution_area = [];
                 this.solution_area_dirty = true;
-                this.recompute_solution_area_cage();
+                this.recompute_solution_area_outline();
                 this.redraw();
                 break;
             case "number":
@@ -10164,7 +10190,7 @@ class Puzzle {
         }
         if (solution_area_modified) {
             this.solution_area_dirty = true;
-            this.recompute_solution_area_cage();
+            this.recompute_solution_area_outline();
         }
         this.make_frameline();
         this.redraw();
@@ -10202,7 +10228,7 @@ class Puzzle {
             }
             if (solution_area_modified) {
                 this.solution_area_dirty = true;
-                this.recompute_solution_area_cage();
+                this.recompute_solution_area_outline();
             }
             this.make_frameline();
             this.redraw();
@@ -10239,7 +10265,7 @@ class Puzzle {
             this.drawing_mode = 0;
         }
         this.solution_area_dirty = true;
-        this.recompute_solution_area_cage();
+        this.recompute_solution_area_outline();
         this.redraw();
     }
 
@@ -10252,7 +10278,7 @@ class Puzzle {
                 this.solution_area.splice(index, 1);
             }
             this.solution_area_dirty = true;
-            this.recompute_solution_area_cage();
+            this.recompute_solution_area_outline();
             this.redraw();
         }
     }
@@ -12946,28 +12972,58 @@ class Puzzle {
     }
 
     draw_solution_area() {
-        // Fallback implementation that simply shades cells inside the solution area. This does not distinguish
-        // between inclusive and exclusive solution areas. Override this with a cage-like presentation for each
-        // grid.
-        const draw_cell = (i) => {
-            if (this.point[i].surround.length == 0) {
-                return;
-            }
-
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.point[this.point[i].surround[0]].x, this.point[this.point[i].surround[0]].y);
-            for (var j = 1; j < this.point[i].surround.length; j++) {
-                this.ctx.lineTo(this.point[this.point[i].surround[j]].x, this.point[this.point[i].surround[j]].y);
-            }
-            this.ctx.closePath();
-            this.ctx.fill();
-            this.ctx.stroke();
+        if (this.solution_area.length === 0 || this.solution_area_outline.length === 0) {
+            return;
         }
 
-        for (var i = 0; i < this.solution_area.length; i++) {
-            set_surface_style(this.ctx, 14);
-            draw_cell(this.solution_area[i]);
+        // Visual parameters
+        const areaColor = Color.BLUE; // Alpha will be set during blending
+        const areaAlpha = 0.2; // Alpha for the shaded area
+        const r = 0.16; //space between border
+
+        // Create offscreen canvas for blending
+        const canvas = document.createElement("canvas");
+        canvas.width = this.canvas.width;
+        canvas.height = this.canvas.height;
+        const ctx = canvas.getContext("2d");
+
+        // Shade the solution area
+        set_surface_style(ctx, 0);
+        ctx.fillStyle = areaColor;
+        for (var i of this.solution_area) {
+            if (this.point[i].surround.length !== 0) {                
+                ctx.beginPath();
+                ctx.moveTo(this.point[this.point[i].surround[0]].x, this.point[this.point[i].surround[0]].y);
+                for (var j = 1; j < this.point[i].surround.length; j++) {
+                    ctx.lineTo(this.point[this.point[i].surround[j]].x, this.point[this.point[i].surround[j]].y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
         }
+
+        // Add or remove the outline around the solution area
+        set_line_style(ctx, 0);
+        ctx.strokeStyle = this.inclusive_solution_area ? areaColor : Color.WHITE;
+        ctx.lineWidth = r * 2 * this.size;             
+        ctx.lineCap = "round";
+
+        for (var segment of this.solution_area_outline) {
+            var i1 = segment[0];
+            var i2 = segment[1];
+            ctx.beginPath();
+            ctx.moveTo(this.point[i1].x, this.point[i1].y);
+            ctx.lineTo(this.point[i2].x, this.point[i2].y);
+            ctx.stroke();
+        }
+
+        // Blend the solution area onto the main canvas
+        this.ctx.save();
+        this.ctx.globalCompositeOperation = "multiply";
+        this.ctx.globalAlpha = areaAlpha;
+        this.ctx.drawImage(canvas, 0, 0);
+        this.ctx.restore();
     }
 
     draw_conflicts() {

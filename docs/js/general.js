@@ -2393,7 +2393,7 @@ function load(urlParam, type = 'url', origurl = null) {
         }
     }
     pu.solution_area_dirty = true;
-    pu.recompute_solution_area_cage();
+    pu.recompute_solution_area_outline();
 
     pu.mode_set(pu.mode[pu.mode.qa].edit_mode, 'url'); //includes redraw
 
@@ -2686,7 +2686,7 @@ function loadver1(paramArray, rtext) {
         pu.inclusive_solution_area = true;
     }
     pu.solution_area_dirty = true;
-    pu.recompute_solution_area_cage();
+    pu.recompute_solution_area_outline();
 
     pu.centerlist = pre_centerlist;
     pu.make_frameline(); // Board drawing
