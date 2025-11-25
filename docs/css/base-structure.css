@@ -590,6 +590,21 @@ hr.newgridhrline {
     font-size: 16px;
 }
 
+.rotate_up {
+    transform: rotate(-90deg);
+    display: inline-block;
+}
+
+.rotate_down {
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
+.rotate_left {
+    transform: rotate(180deg);
+    display: inline-block;
+}
+
 #ms1_degital {
     font-size: 18px;
 }

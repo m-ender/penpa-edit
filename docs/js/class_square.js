@@ -1461,6 +1461,23 @@ class Puzzle_square extends Puzzle {
             } else {
                 factor = 0;
             }
+
+            if (this[pu].number[i][3]) {
+                let dir = this[pu].number[i][3];
+                let angle = 0;
+                switch (dir) {
+                case 'U': angle = -Math.PI/2; break;
+                case 'D': angle = Math.PI/2; break;
+                case 'L': angle = Math.PI; break;
+                }
+                this.ctx.save();
+                this.ctx.translate(p_x, p_y);
+                this.ctx.rotate(angle);
+                this.ctx.translate(-p_x, -p_y);
+
+                // TODO: only rotate the number in arrow mode, not the arrow
+            }
+
             switch (this[pu].number[i][2]) {
                 case "1": //normal
                     set_font_style(this.ctx, 0.7 * this.size.toString(10), this[pu].number[i][1]);
@@ -1719,6 +1736,10 @@ class Puzzle_square extends Puzzle {
                     }
                     break;
             }
+
+            if (this[pu].number[i][3]) {
+                this.ctx.restore();
+            }
         }
 
         for (var i in this[pu].numberS) {
@@ -1737,6 +1758,21 @@ class Puzzle_square extends Puzzle {
             }
             if (true) { //(this[pu].numberS[i][0].length <= 2 ){
                 if (this.point[i]) {
+                    
+                    if (this[pu].numberS[i][2]) {
+                        let dir = this[pu].numberS[i][2];
+                        let angle = 0;
+                        switch (dir) {
+                        case 'U': angle = -Math.PI/2; break;
+                        case 'D': angle = Math.PI/2; break;
+                        case 'L': angle = Math.PI; break;
+                        }
+                        this.ctx.save();
+                        this.ctx.translate(this.point[i].x, this.point[i].y);
+                        this.ctx.rotate(angle);
+                        this.ctx.translate(-this.point[i].x, -this.point[i].y);
+                    }
+
                     var [_, _, j] = this.point[i].index;
                     set_font_style(this.ctx, 0.32 * this.size.toString(10), this[pu].numberS[i][1]);
                     var n = parseInt(this[pu].numberS[i][0]);
@@ -1747,6 +1783,10 @@ class Puzzle_square extends Puzzle {
                     this.ctx.textAlign = "center";
                     this.ctx.text(this[pu].numberS[i][0], this.point[i].x, this.point[i].y + 0.03 * this.size, this.size * 0.48);
                     this.ctx.fillStyle = style;
+
+                    if (this[pu].numberS[i][2]) {
+                        this.ctx.restore();
+                    }
                 }
                 //}else{
                 //  set_font_style(this.ctx,0.28*this.size.toString(10),this[pu].numberS[i][1]);
