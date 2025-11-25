@@ -1068,7 +1068,7 @@ onload = function() {
 
     function window_click(e) {
         let eventTarget = e.target;
-        if (eventTarget.classList.contains('fa')) {
+        if (eventTarget.classList.contains('fa') || eventTarget.classList.contains('rotate')) {
             eventTarget = eventTarget.parentElement;
         }
 
@@ -1951,6 +1951,10 @@ onload = function() {
         } else if (e.target.id.slice(0, 3) === "st_") { // Style mode
             pu.stylemode_check(e.target.id.slice(0, -3));
             e.preventDefault();
+        }
+        // Number orientation
+        if (eventTarget.id.slice(0, 4) === "rot_") {
+            pu.set_orientation(eventTarget.id.slice(4, -3));
         }
         // Combination mode
         if (eventTarget.id.slice(0, 9) === "combisub_") {

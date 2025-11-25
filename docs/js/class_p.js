@@ -1330,6 +1330,9 @@ class Puzzle {
             this.subsymbolmode(submode, skipredraw);
         } else if (mode === "combi") {
             this.subcombimode(submode, skipredraw);
+        } else if (mode === "number") {
+            const dir = this.mode[this.mode.qa][mode][2] || 'R';
+            this.set_orientation(dir);
         }
         if (UserSettings.custom_colors_on && penpa_modes[this.gridtype].customcolor.includes(mode)) {
             let cc = this.mode[this.mode.qa][mode][2];
@@ -1350,6 +1353,7 @@ class Puzzle {
             let isNumberS = ["3", "9", "11"].includes(pu.mode[pu.mode.qa][pu.mode[pu.mode.qa].edit_mode][0])
             let enableLoadButton = (!isNumberS && pu[pu.mode.qa].number[pu.cursol]) || (isNumberS && pu[pu.mode.qa].numberS[pu.cursolS]);
             document.getElementById("closeBtn_input3").disabled = !enableLoadButton;
+            document.getElementById('orientation_button').style.display = 'block';
         }
 
         if (!skipredraw)
@@ -1404,6 +1408,14 @@ class Puzzle {
             panel_pu.draw_panel(); // Panel update
         }
         this.set_custom_color(name);
+    }
+
+    set_orientation(direction) {
+        let input_name = "rot_" + direction;
+        if (document.getElementById(input_name)) {
+            document.getElementById(input_name).checked = true;
+            this.mode[this.mode.qa][this.mode[this.mode.qa].edit_mode][2] = direction;
+        }
     }
 
     subsymbolmode(mode, skipredraw = false) {
@@ -1494,6 +1506,8 @@ class Puzzle {
         document.getElementById('style_cage').style.display = 'none';
         document.getElementById('style_combi').style.display = 'none';
         document.getElementById('style_sudoku').style.display = 'none';
+        
+        document.getElementById('orientation_button').style.display = 'none';
     }
 
     reset_selectedmode() {
@@ -7390,6 +7404,7 @@ class Puzzle {
         var str_num = "1234567890";
         let edit_mode = this.mode[this.mode.qa].edit_mode;
         let submode = this.mode[this.mode.qa][edit_mode];
+        let orientation = submode[2] && submode[2] !== 'R' ? [submode[2]] : [];
 
         // If ZXCV is disabled
         if (!UserSettings.shortcuts_enabled || force_no_shortcut) {
@@ -7452,7 +7467,7 @@ class Puzzle {
                             number = key;
                         }
 
-                        this.set_value("number", k, [number, submode[1], submode[0]]);
+                        this.set_value("number", k, [number, submode[1], submode[0], ...orientation]);
                         break;
                     case "2": // Arrow
                         if (this[this.mode.qa].number[k] && this[this.mode.qa].number[k][2] != "7") {
@@ -7476,7 +7491,7 @@ class Puzzle {
                         } else {
                             number = key;
                         }
-                        this.set_value("number", k, [number + arrow, submode[1], submode[0]]);
+                        this.set_value("number", k, [number + arrow, submode[1], submode[0], ...orientation]);
                         break;
                     case "3": // 1/4, corner
                     case "9": // Sides
@@ -7486,7 +7501,7 @@ class Puzzle {
                             con = "";
                         }
                         number = con + key;
-                        this.set_value("numberS", k, [number, submode[1]]);
+                        this.set_value("numberS", k, [number, submode[1], ...orientation]);
                         break;
                     case "4": //tapa
                         if (key === ".") { key = " "; }
@@ -7507,7 +7522,7 @@ class Puzzle {
                         } else { // Overwrite if arrow
                             number = key;
                         }
-                        this.set_value("number", k, [number, submode[1], submode[0]]);
+                        this.set_value("number", k, [number, submode[1], submode[0], ...orientation]);
                         break;
                     case "5": // Small
                     case "6": // Medium
@@ -7522,7 +7537,7 @@ class Puzzle {
                         const limit = (submode[0] === "8") ? 1000 : 10;
                         if (con.length < limit) {
                             number = con + key;
-                            this.set_value("number", k, [number, submode[1], submode[0]]);
+                            this.set_value("number", k, [number, submode[1], submode[0], ...orientation]);
                         }
                         break;
                     case "7": // Candidates
@@ -7537,7 +7552,7 @@ class Puzzle {
                                 con = "";
                             }
                             number = this.onofftext(9, key, con);
-                            let value = [number, submode[1], submode[0]];
+                            let value = [number, submode[1], submode[0], ...orientation];
                             this[this.mode.qa][prop][k] = value;
                             this.record_replay(prop, k, this.undoredo_counter);
                         }
@@ -7550,7 +7565,7 @@ class Puzzle {
                             con = "";
                         }
                         number = con + key;
-                        this.set_value("numberS", corner_cursor, [number, submode[1]]);
+                        this.set_value("numberS", corner_cursor, [number, submode[1], ...orientation]);
                         break;
                 }
             }
@@ -9213,7 +9228,11 @@ class Puzzle {
                 } else {
                     number = con + "_" + arrowdirection;
                 }
-                this[this.mode.qa].number[this.cursol] = [number, this.mode[this.mode.qa][this.mode[this.mode.qa].edit_mode][1], "2"];
+                
+                let edit_mode = this.mode[this.mode.qa].edit_mode;
+                let submode = this.mode[this.mode.qa][edit_mode];
+                let orientation = submode[2] && submode[2] !== 'R' ? [submode[2]] : [];
+                this[this.mode.qa].number[this.cursol] = [number, submode[1], "2", ...orientation];
                 this.record_replay("number", this.cursol);
                 this.drawing = false;
                 this.last = -1;
